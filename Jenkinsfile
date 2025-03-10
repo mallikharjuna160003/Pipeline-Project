@@ -12,11 +12,23 @@ pipeline {
    stage("NPM Dependency Audit"){
       steps {
         sh '''
-
+            # checking critical vulnerability checks
             npm audit --audit-level=critical
             echo $?
         '''
       }
+   }
+   stage("OWASP Dependency Check"){
+      steps {
+        dependencyCheck additionalArguments: ''' 
+                    -o './'
+                    -s './'
+                    -f 'ALL' 
+                    --prettyPrint''', odcInstallation: 'OWASP Dependency-Check Vulnerabilities'
+        
+        dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+      }
+    }
    }
     
   }
