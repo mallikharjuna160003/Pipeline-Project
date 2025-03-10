@@ -14,7 +14,6 @@ pipeline {
 	   stage("NPM Dependency Audit"){
 	      steps {
 		sh '''
-		    # checking critical vulnerability checks
 		    npm audit --audit-level=critical
 		    echo $?
 		'''
