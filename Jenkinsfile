@@ -6,7 +6,6 @@ pipeline {
   stages {
     stage("Dependencies installation"){
       steps {
-        sh 'echo Welcome'
         sh 'npm install --no-default'
       }
     }
