@@ -4,37 +4,64 @@ pipeline {
     nodejs 'nodejs-22-6-0'
   }
   environment {
-	NVD_API_KEY = 'c89da9be-83e0-4e47-9809-bbe41ef076a7'
+    NVD_API_KEY = 'c89da9be-83e0-4e47-9809-bbe41ef076a7'
   }
 
   stages {
-    stage("Dependencies installation"){
+    stage("Dependencies installation") {
       steps {
         sh 'npm install --no-default'
       }
     }
-  stage('Dependency Scanning'){
-     parallel {
-	   stage("NPM Dependency Audit"){
-	      steps {
-		sh '''
-		    npm audit --audit-level=critical
-		    echo $?
-		'''
-	      }
-	   }
-	   stage("OWASP Dependency Check"){
-	      steps {
-		dependencyCheck additionalArguments: ''' 
-			    -o './'
-			    -s './'
-			    -f 'ALL' 
-			    --prettyPrint
-                            --nvdApiKey $NVD_API_KEY''', odcInstallation: 'OWASP-DepCheck-10'
-		
-	      }
-	   }
+
+    stage('Dependency Scanning') {
+      parallel {
+        stage("NPM Dependency Audit") {
+          steps {
+            sh '''
+              npm audit --audit-level=critical
+              echo $?
+            '''
+          }
+        }
+
+        stage("OWASP Dependency Check") {
+          steps {
+            script {
+              try {
+                echo "Running OWASP Dependency Check..."
+                // Run Dependency-Check with API key
+                dependencyCheck additionalArguments: ''' 
+                    -o './'
+                    -s './'
+                    -f 'ALL' 
+                    --prettyPrint
+                    --nvdApiKey $NVD_API_KEY
+                ''', odcInstallation: 'OWASP-DepCheck-10'
+              } catch (Exception e) {
+                echo "Error in OWASP Dependency-Check: ${e.getMessage()}"
+                echo "Using cached local data instead of NVD data..."
+                // Run Dependency-Check with local data if the update fails
+                dependencyCheck additionalArguments: ''' 
+                    -o './'
+                    -s './'
+                    -f 'ALL' 
+                    --prettyPrint
+                    --disableUpdates
+                ''', odcInstallation: 'OWASP-DepCheck-10'
+              }
+            }
+          }
+        }
       }
     }
-   }    
+  }
+  post {
+    failure {
+      echo 'Build failed due to dependency scanning issues.'
+    }
+    success {
+      echo 'Dependency scanning completed successfully.'
+    }
+  }
 }
