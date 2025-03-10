@@ -2,7 +2,12 @@ pipeline {
   agent any
   tools {
     nodejs 'nodejs-22-6-0'
-  } 
+  }
+ 
+  environment {
+     NVD_API_KEY = credentials('NVD_API_KEY')
+  }
+
   stages {
     stage("Dependencies installation"){
       steps {
@@ -25,6 +30,7 @@ pipeline {
 			    -o './'
 			    -s './'
 			    -f 'ALL' 
+                            --nvd-api-key $NVD_API_KEY
 			    --prettyPrint''', odcInstallation: 'OWASP-DepCheck-10'
 		
 	      }
