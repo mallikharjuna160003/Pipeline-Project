@@ -34,8 +34,6 @@ pipeline {
           steps {
             script {
               echo "Running OWASP Dependency Check..."
-              // Cache the results directory of OWASP Dependency Check
-              cache(path: 'dependency-check-report', key: 'owasp-report') {
                 dependencyCheck additionalArguments: ''' 
                     -o './dependency-check-report'
                     -s './'
@@ -44,7 +42,6 @@ pipeline {
                     --nvdApiKey $NVD_API_KEY
                 ''', odcInstallation: 'OWASP-DepCheck-10'
               }
-            }
           }
         }
       }
