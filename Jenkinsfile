@@ -37,6 +37,7 @@ pipeline {
                   -f 'ALL' 
                   --prettyPrint
                   --nvdApiKey $NVD_API_KEY
+                  --nvdApiDelay 8000
               ''', odcInstallation: 'OWASP-DepCheck-10'
              dependencyCheckPublisher failedTotalCritical: 1, pattern: 'dependency-check-result.xml'
             }
