@@ -37,7 +37,7 @@ pipeline {
                   -f 'ALL' 
                   --prettyPrint
                   --nvdApiKey $NVD_API_KEY
-                  --dataDirectory '/var/lib/jenkins/tools/OWASP-DepCheck-10'  // Use the local NVD data
+                  --disableNvdCve 
               ''', odcInstallation: 'OWASP-DepCheck-10'
              dependencyCheckPublisher failedTotalCritical: 1, pattern: 'dependency-check-result.xml'
             }
