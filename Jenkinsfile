@@ -11,9 +11,7 @@ pipeline {
     stage("Dependencies installation") {
       steps {
         script {
-          // Cache node_modules directory
-          cache(path: 'node_modules', key: 'npm-modules') {
-            sh 'npm ci'
+            sh 'npm install --no-default'
           }
         }
       }
@@ -35,7 +33,7 @@ pipeline {
             script {
               echo "Running OWASP Dependency Check..."
                 dependencyCheck additionalArguments: ''' 
-                    -o './dependency-check-report'
+                    -o './'
                     -s './'
                     -f 'ALL' 
                     --prettyPrint
