@@ -5,13 +5,17 @@ pipeline {
   }
   environment {
     NVD_API_KEY = 'c89da9be-83e0-4e47-9809-bbe41ef076a7'
- 
   }
 
   stages {
     stage("Dependencies installation") {
       steps {
-        sh 'npm install --no-default'
+        script {
+          // Cache node_modules directory
+          cache(path: 'node_modules', key: 'npm-modules') {
+            sh 'npm ci'
+          }
+        }
       }
     }
 
@@ -29,10 +33,11 @@ pipeline {
         stage("OWASP Dependency Check") {
           steps {
             script {
-                echo "Running OWASP Dependency Check..."
-                // Run Dependency-Check with API key
+              echo "Running OWASP Dependency Check..."
+              // Cache the results directory of OWASP Dependency Check
+              cache(path: 'dependency-check-report', key: 'owasp-report') {
                 dependencyCheck additionalArguments: ''' 
-                    -o './'
+                    -o './dependency-check-report'
                     -s './'
                     -f 'ALL' 
                     --prettyPrint
@@ -44,6 +49,8 @@ pipeline {
         }
       }
     }
+  }
+  
   post {
     failure {
       echo 'Build failed due to dependency scanning issues.'
