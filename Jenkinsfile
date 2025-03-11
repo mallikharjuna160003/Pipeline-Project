@@ -28,7 +28,6 @@ pipeline {
         stage("OWASP Dependency Check") {
           steps {
             script {
-              try {
                 echo "Running OWASP Dependency Check..."
                 // Run Dependency-Check with API key
                 dependencyCheck additionalArguments: ''' 
@@ -38,24 +37,12 @@ pipeline {
                     --prettyPrint
                     --nvdApiKey $NVD_API_KEY
                 ''', odcInstallation: 'OWASP-DepCheck-10'
-              } catch (Exception e) {
-                echo "Error in OWASP Dependency-Check: ${e.getMessage()}"
-                echo "Using cached local data instead of NVD data..."
-                // Run Dependency-Check with local data if the update fails
-                dependencyCheck additionalArguments: ''' 
-                    -o './'
-                    -s './'
-                    -f 'ALL' 
-                    --prettyPrint
-                    --disableUpdates
-                ''', odcInstallation: 'OWASP-DepCheck-10'
               }
             }
           }
         }
       }
     }
-  }
   post {
     failure {
       echo 'Build failed due to dependency scanning issues.'
