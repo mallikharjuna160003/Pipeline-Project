@@ -11,8 +11,7 @@ pipeline {
     stage("Dependencies installation") {
       steps {
         script {
-            sh 'npm install --no-default'
-          }
+          sh 'npm install --no-default'
         }
       }
     }
@@ -32,14 +31,14 @@ pipeline {
           steps {
             script {
               echo "Running OWASP Dependency Check..."
-                dependencyCheck additionalArguments: ''' 
-                    -o './'
-                    -s './'
-                    -f 'ALL' 
-                    --prettyPrint
-                    --nvdApiKey $NVD_API_KEY
-                ''', odcInstallation: 'OWASP-DepCheck-10'
-              }
+              dependencyCheck additionalArguments: ''' 
+                  -o './'
+                  -s './'
+                  -f 'ALL' 
+                  --prettyPrint
+                  --nvdApiKey $NVD_API_KEY
+              ''', odcInstallation: 'OWASP-DepCheck-10'
+            }
           }
         }
       }
@@ -55,3 +54,4 @@ pipeline {
     }
   }
 }
+
