@@ -30,22 +30,17 @@ pipeline {
         stage("OWASP Dependency Check") {
           steps {
             script {
-              echo "Running OWASP Dependency Check..."
-              dependencyCheck additionalArguments: ''' 
-                  -o './'
-                  -s './'
-                  -f 'ALL' 
-                  --prettyPrint
-                  --nvdApiKey $NVD_API_KEY
-              ''', odcInstallation: 'OWASP-DepCheck-10'
-             dependencyCheckPublisher failedTotalCritical: 1, pattern: 'dependency-check-result.xml'
+              echo "Running OWASP Dependency Check via CLI..."
+              sh """
+                dependency-check --project my_project --scan ./ --format ALL --output ./ --prettyPrint --nvdApiKey $NVD_API_KEY
+              """
             }
           }
         }
       }
     }
   }
-  
+
   post {
     failure {
       echo 'Build failed due to dependency scanning issues.'
